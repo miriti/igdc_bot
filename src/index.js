@@ -10,8 +10,6 @@ async function main() {
   console.log(me);
 
   while (true) {
-    console.log('%s %s', new Date(), 'Requesting new messages');
-
     let response = await request({
       url: 'http://igdc.ru/infusions/shoutbox_panel/shoutbox.php',
       json: true,
@@ -55,8 +53,7 @@ async function main() {
       }
     }
 
-    console.log('%s %s', new Date(), 'Waiting for 10 minutes');
-    await sleep(600000);
+    await sleep(60000);
   }
 }
 
