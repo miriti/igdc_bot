@@ -1,0 +1,24 @@
+{
+  "name": "igdc_bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "request": "^2.83.0",
+    "request-promise-native": "^1.0.5",
+    "sleep-promise": "^2.0.0",
+    "sqlite3": "^3.1.13",
+    "unescape": "^1.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/mmiriti/igdc_bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/mmiriti/igdc_bot#readme"
+}
