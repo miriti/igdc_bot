@@ -4,6 +4,9 @@ const sleep = require('sleep-promise');
 
 const api = require('./api');
 const db = require('./db');
+const forum = require('./forum');
+
+const channel = process.env['CHANNEL'] || '@igdc_chat';
 
 async function main() {
   let me = await api.getMe();
@@ -39,7 +42,7 @@ async function main() {
 
         try {
           await api.sendMessage(
-            '@igdc_chat',
+            channel,
             '<a href="http://igdc.ru/infusions/shoutbox_panel/shoutbox_archive.php">Мини-чат</a>' +
               '\n' +
               '<b>' +
@@ -51,6 +54,22 @@ async function main() {
           console.error(err);
         }
       }
+    }
+
+    let latestMessage = await forum.getLastMessage();
+    if (!await db.getForumPost(latestMessage['id'])) {
+      db.storeForumPost(latestMessage);
+      await api.sendMessage(
+        channel,
+        '<a href="' +
+          latestMessage['url'] +
+          '">' +
+          latestMessage['thread'] +
+          '</a>\n<b>' +
+          latestMessage['username'] +
+          '</b>\n' +
+          latestMessage['html'],
+      );
     }
 
     await sleep(60000);

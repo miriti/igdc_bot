@@ -33,6 +33,43 @@ class Db {
     });
   }
 
+  async storeForumPost(data) {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        `INSERT INTO forum_posts (id, url, thread, username, html)
+      VALUES (?, ?, ?, ?, ?)`,
+        data['id'],
+        data['url'],
+        data['thread'],
+        data['username'],
+        data['html'],
+        (err, result) => {
+          if (!err) {
+            resolve(result);
+          } else {
+            reject(err);
+          }
+        },
+      );
+    });
+  }
+
+  async getForumPost(id) {
+    return new Promise((resolve, reject) => {
+      this.db.get(
+        'SELECT * FROM forum_posts WHERE id = ?',
+        id,
+        (err, result) => {
+          if (!err) {
+            resolve(result);
+          } else {
+            reject(err);
+          }
+        },
+      );
+    });
+  }
+
   constructor() {
     this.db = new sqlite.Database('data.db');
     this.db.serialize(() => {
@@ -41,6 +78,14 @@ class Db {
         text TEXT,
         user_id INTEGER,
         user_name TEXT
+      )`);
+
+      this.db.run(`CREATE TABLE IF NOT EXISTS forum_posts (
+        id INTEGER PRIMARY KEY,
+        url TEXT,
+        thread TEXT,
+        username TEXT,
+        html TEXT
       )`);
     });
   }
