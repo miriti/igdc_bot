@@ -43,8 +43,7 @@ class Forum {
         .parent()
         .next()
         .find('td')
-        .html()
-        .replace('<br>', '\n'),
+        .html(),
       ['b', 'i', 'a'],
     );
 
