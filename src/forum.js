@@ -1,16 +1,30 @@
 const request = require('request-promise-native');
 const cheerio = require('cheerio');
+const striptags = require('striptags');
 
 class Forum {
   async getLastMessage() {
-    let $ = cheerio.load(await request('http://igdc.ru/'));
+    let $;
+
+    try {
+      $ = cheerio.load(await request('http://igdc.ru/'));
+    } catch (err) {
+      console.error(err);
+      process.exit();
+    }
+
     let url = $('.side-body a.sidePost').attr('href');
 
     let postHash = url.slice(url.indexOf('#'));
 
-    $ = cheerio.load(await request('http://igdc.ru/' + url), {
-      decodeEntities: false,
-    });
+    try {
+      $ = cheerio.load(await request('http://igdc.ru/' + url), {
+        decodeEntities: false,
+      });
+    } catch (err) {
+      console.error(err);
+      process.exit();
+    }
 
     let threadName = $('.capmain').html();
 
@@ -22,13 +36,17 @@ class Forum {
       .find('a.header')
       .html();
 
-    let postHtml = $('a[href="' + postHash + '"]')
-      .parent()
-      .parent()
-      .parent()
-      .next()
-      .find('td')
-      .html();
+    let postHtml = striptags(
+      $('a[href="' + postHash + '"]')
+        .parent()
+        .parent()
+        .parent()
+        .next()
+        .find('td')
+        .html()
+        .replace('<br>', '\n'),
+      ['b', 'i', 'a'],
+    );
 
     return {
       id: Number(postHash.replace(/\D/g, '')),
