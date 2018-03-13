@@ -8,7 +8,8 @@ const db = require('./db');
 const forum = require('./forum');
 const news = require('./news');
 
-const channel = process.env['CHANNEL'] || '@igdc_chat';
+const channel = process.env['CHANNEL'] || '@igdc_updates';
+const chat = process.env['CHAT'] || '@igdc_chat';
 
 async function main() {
   let me = await api.getMe();
@@ -85,6 +86,17 @@ async function main() {
             author: newsItem['author'],
             html: postHtml,
           });
+
+          await api.sendMessage(
+            chat,
+            '<b>' +
+              newsItem['title'] +
+              '</b>\n' +
+              postHtml +
+              '\n\n<i>' +
+              newsItem['author'] +
+              '</i>',
+          );
 
           await api.sendMessage(
             channel,
