@@ -37,6 +37,7 @@ async function main() {
           });
 
           try {
+            console.log('> %s', channel);
             await api.sendMessage(
               channel,
               '<a href="http://igdc.ru/infusions/shoutbox_panel/shoutbox_archive.php">Мини-чат</a>' +
@@ -59,6 +60,7 @@ async function main() {
       let latestMessage = await forum.getLastMessage();
       if (!await db.get('forum_posts', latestMessage['id'])) {
         db.store('forum_posts', latestMessage);
+        console.log('> %s', channel);
         await api.sendMessage(
           channel,
           '<a href="' +
@@ -87,6 +89,7 @@ async function main() {
             html: postHtml,
           });
 
+          console.log('> %s', chat);
           await api.sendMessage(
             chat,
             '<b>' +
@@ -98,6 +101,7 @@ async function main() {
               '</i>',
           );
 
+          console.log('> %s', channel);
           await api.sendMessage(
             channel,
             '<b>' +
