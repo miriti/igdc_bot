@@ -47,12 +47,12 @@ async function main() {
                 message['text'],
             );
           } catch (err) {
-            console.error(err);
+            console.error(err.message);
           }
         }
       }
     } catch (err) {
-      console.error(err);
+      console.error(err.message);
     }
 
     try {
@@ -72,7 +72,7 @@ async function main() {
         );
       }
     } catch (err) {
-      console.error(err);
+      console.error(err.message);
     }
 
     try {
@@ -111,7 +111,7 @@ async function main() {
         }
       }
     } catch (err) {
-      console.error(err);
+      console.error(err.message);
     }
 
     await sleep(60000);
