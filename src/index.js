@@ -8,7 +8,7 @@ const chat = process.env['CHAT'] || '@igdc_chat';
 
 async function delay() {
   return new Promise(resolve => {
-    setTimeout(resolve, 60000);
+    setTimeout(resolve, 600000);
   });
 }
 
