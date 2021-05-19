@@ -29,6 +29,8 @@ async function main() {
     } catch (err) {
       console.error(new Date(), err);
     }
+
+    await delay();
   }
 }
 
