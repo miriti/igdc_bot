@@ -58,28 +58,18 @@ class Db {
 
     this.db.serialize(() => {
       // Сообщения мини-чата
-      this.db.run(`CREATE TABLE IF NOT EXISTS messages (
-        id INTEGER PRIMARY KEY,
-        text TEXT,
-        user_id INTEGER,
-        user_name TEXT
+      this.db.run(`CREATE TABLE IF NOT EXISTS chat (
+        id INTEGER PRIMARY KEY
       )`);
 
       // Посты форума
-      this.db.run(`CREATE TABLE IF NOT EXISTS forum_posts (
-        id INTEGER PRIMARY KEY,
-        url TEXT,
-        thread TEXT,
-        username TEXT,
-        html TEXT
+      this.db.run(`CREATE TABLE IF NOT EXISTS forum (
+        id INTEGER PRIMARY KEY
       )`);
 
       // Новости
       this.db.run(`CREATE TABLE IF NOT EXISTS news (
-        id TEXT PRIMARY KEY,
-        title TEXT,
-        author TEXT,
-        html TEXT
+        id INTEGER PRIMARY KEY
       )`);
     });
   }

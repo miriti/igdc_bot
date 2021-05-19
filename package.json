@@ -4,24 +4,23 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "cheerio": "^1.0.0-rc.2",
-    "request": "^2.83.0",
-    "request-promise-native": "^1.0.5",
-    "rss-parser": "^3.1.2",
-    "sleep-promise": "^2.0.0",
-    "sqlite3": "^3.1.13",
+    "cheerio": "^1.0.0-rc.9",
+    "node-fetch": "^2.6.1",
+    "rss-parser": "^3.12.0",
+    "sleep-promise": "^9.1.0",
+    "sqlite3": "^5.0.2",
     "striptags": "^3.1.1",
     "unescape": "^1.0.1"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./src"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/mmiriti/igdc_bot.git"
+    "url": "git@github.com:miriti/igdc_bot.git"
   },
-  "author": "",
-  "license": "ISC",
-  "homepage": "https://bitbucket.org/mmiriti/igdc_bot#readme"
+  "author": "Michael \"KEFIR\" Miriti",
+  "license": "MIT",
+  "homepage": "https://github.com/miriti/igdc_bot"
 }

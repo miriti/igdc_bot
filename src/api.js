@@ -1,9 +1,8 @@
-const request = require('request-promise-native');
-
+const fetch = require('node-fetch');
 /**
  * Telegram API
  */
-class TelegramAPI {
+module.exports = class TelegramAPI {
   /**
    * Send message
    */
@@ -16,29 +15,23 @@ class TelegramAPI {
   }
 
   /**
-   * Get Me
-   */
-  async getMe() {
-    return this.request('get', 'getMe');
-  }
-
-  /**
    * Generic request
    */
   async request(http_method, method, data) {
-    return request[http_method]({
-      url: 'https://api.telegram.org/bot' + this.token + '/' + method,
-      json: true,
-      body: data,
-    });
+    const url = `https://api.telegram.org/bot${this.token}/${method}`;
+    const body = data ? JSON.stringify(data) : null;
+
+    return fetch(url, {
+      method: http_method,
+      body,
+      headers: { 'Content-Type': 'application/json' },
+    }).then(r => r.json());
   }
 
   /**
    * Constructor
    */
-  constructor() {
-    this.token = process.env['TELEGRAM_TOKEN'];
+  constructor(token) {
+    this.token = token;
   }
-}
-
-module.exports = new TelegramAPI();
+};

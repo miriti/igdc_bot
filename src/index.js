@@ -1,124 +1,34 @@
-const request = require('request-promise-native');
-const sleep = require('sleep-promise');
-const unescape = require('unescape');
-const striptags = require('striptags');
+const Bot = require('./bot');
 
-const api = require('./api');
-const db = require('./db');
-const forum = require('./forum');
-const news = require('./news');
-
+/** Канал для отправки всех обновлений */
 const channel = process.env['CHANNEL'] || '@igdc_updates';
+
+/** Чат, куда не следует спамить всем подряд, одних новостей будет достаточно */
 const chat = process.env['CHAT'] || '@igdc_chat';
 
+async function delay() {
+  return new Promise(resolve => {
+    setTimeout(resolve, 60000);
+  });
+}
+
 async function main() {
-  let me = await api.getMe();
-  console.log(me);
+  if (!process.env['TELEGRAM_TOKEN']) {
+    console.error('TELEGRAM_TOKEN is required');
+    return;
+  }
+
+  const bot = new Bot(process.env['TELEGRAM_TOKEN']);
 
   while (true) {
     try {
-      let response = await request({
-        url: 'http://igdc.ru/infusions/shoutbox_panel/shoutbox.php',
-        json: true,
-      });
-
-      for (let message of response['messages']) {
-        message['text'] = unescape(message['text']);
-        message['user']['name'] = unescape(message['user']['name']);
-
-        let db_message = await db.get('messages', message['id']);
-
-        if (!db_message) {
-          await db.store('messages', {
-            id: message['id'],
-            text: message['text'],
-            user_id: message['user']['id'],
-            user_name: message['user']['name'],
-          });
-
-          try {
-            console.log('> %s', channel);
-            await api.sendMessage(
-              channel,
-              '<a href="http://igdc.ru/infusions/shoutbox_panel/shoutbox_archive.php">Мини-чат</a>' +
-                '\n' +
-                '<b>' +
-                message['user']['name'].trim() +
-                '</b>: ' +
-                message['text'],
-            );
-          } catch (err) {
-            console.error(err.message);
-          }
-        }
-      }
+      await bot.fetchShoutbox([channel]);
+      await bot.fetchForum([channel]);
+      await bot.fetchNews([channel, chat]);
+      console.log(new Date(), ' Update: OK');
     } catch (err) {
-      console.error(err.message);
+      console.error(new Date(), err);
     }
-
-    try {
-      let latestMessage = await forum.getLastMessage();
-      if (!await db.get('forum_posts', latestMessage['id'])) {
-        db.store('forum_posts', latestMessage);
-        console.log('> %s', channel);
-        await api.sendMessage(
-          channel,
-          '<a href="' +
-            latestMessage['url'] +
-            '">' +
-            latestMessage['thread'] +
-            '</a>\n<b>' +
-            latestMessage['username'] +
-            '</b>\n' +
-            latestMessage['html'],
-        );
-      }
-    } catch (err) {
-      console.error(err.message);
-    }
-
-    try {
-      let latestNews = await news.getNews();
-      for (let newsItem of latestNews) {
-        if (!await db.get('news', newsItem['pubDate'])) {
-          let postHtml = striptags(newsItem['content'], ['a', 'b', 'i']);
-          await db.store('news', {
-            id: newsItem['pubDate'],
-            title: newsItem['title'],
-            author: newsItem['author'],
-            html: postHtml,
-          });
-
-          console.log('> %s', chat);
-          await api.sendMessage(
-            chat,
-            '<b>' +
-              newsItem['title'] +
-              '</b>\n' +
-              postHtml +
-              '\n\n<i>' +
-              newsItem['author'] +
-              '</i>',
-          );
-
-          console.log('> %s', channel);
-          await api.sendMessage(
-            channel,
-            '<b>' +
-              newsItem['title'] +
-              '</b>\n' +
-              postHtml +
-              '\n\n<i>' +
-              newsItem['author'] +
-              '</i>',
-          );
-        }
-      }
-    } catch (err) {
-      console.error(err.message);
-    }
-
-    await sleep(60000);
   }
 }
 

@@ -1,4 +1,4 @@
-const request = require('request-promise-native');
+const fetch = require('node-fetch');
 const cheerio = require('cheerio');
 const striptags = require('striptags');
 
@@ -7,20 +7,27 @@ class Forum {
     let $;
 
     try {
-      $ = cheerio.load(await request('http://igdc.ru/'));
+      const html = await fetch('http://igdc.ru/').then(r => r.text());
+
+      $ = cheerio.load(html);
     } catch (err) {
       console.error(err);
-      process.exit();
+      return null;
     }
 
-    let url = $('.side-body a.sidePost').attr('href');
+    let lastPostEl = $('.side-body a.sidePost');
+
+    let url = lastPostEl.attr('href');
 
     let postHash = url.slice(url.indexOf('#'));
 
     try {
-      $ = cheerio.load(await request('http://igdc.ru/' + url), {
-        decodeEntities: false,
-      });
+      $ = cheerio.load(
+        await fetch('http://igdc.ru/' + url).then(r => r.text()),
+        {
+          decodeEntities: false,
+        },
+      );
     } catch (err) {
       console.error(err);
       process.exit();
