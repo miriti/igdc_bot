@@ -13,7 +13,14 @@ class News {
   }
 
   async _getNews_crutch() {
-    const html = await fetch('http://igdc.ru/').then(r => r.text());
+    try {
+      const response = await fetch('http://igdc.ru/');
+      const html = await response.text();
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+
     let $ = cheerio.load(html);
 
     const result = [];

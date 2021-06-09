@@ -7,7 +7,8 @@ class Forum {
     let $;
 
     try {
-      const html = await fetch('http://igdc.ru/').then(r => r.text());
+      const response = await fetch('http://igdc.ru/');
+      const html = await response.text();
 
       $ = cheerio.load(html);
     } catch (err) {

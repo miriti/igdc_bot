@@ -14,9 +14,10 @@ module.exports = class Bot {
     try {
       let response = await fetch(
         'http://igdc.ru/infusions/shoutbox_panel/shoutbox.php',
-      ).then(r => r.json());
+      );
+      const responseJson = await response.json();
 
-      for (let msg of response['messages']) {
+      for (let msg of responseJson['messages']) {
         const exists = await db.get('chat', msg['id']);
 
         if (!exists) {
