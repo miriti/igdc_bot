@@ -13,9 +13,10 @@ class News {
   }
 
   async _getNews_crutch() {
+    let html;
     try {
       const response = await fetch('http://igdc.ru/');
-      const html = await response.text();
+      html = await response.text();
     } catch (e) {
       console.error(e);
       return [];
