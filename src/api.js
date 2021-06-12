@@ -15,6 +15,28 @@ module.exports = class TelegramAPI {
   }
 
   /**
+   * @param {Array<Object>} media
+   */
+  async sendMediaGroup(to, message, media) {
+    return this.request('post', 'sendMediaGroup', {
+      chat_id: to,
+      media: media.map((url, index) => {
+        const obj = {
+          type: 'photo',
+          media: url,
+          parse_mode: 'HTML',
+        };
+
+        if (index == 0) {
+          obj['caption'] = message;
+        }
+
+        return obj;
+      }),
+    });
+  }
+
+  /**
    * Generic request
    */
   async request(http_method, method, data) {

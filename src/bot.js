@@ -3,6 +3,7 @@ const fetch = require('node-fetch');
 const db = require('./db');
 const forum = require('./forum');
 const news = require('./news');
+const striptags = require('striptags');
 
 module.exports = class Bot {
   /**
@@ -105,7 +106,11 @@ module.exports = class Bot {
           lastPost['html'];
 
         for (let chan of to) {
-          this.api.sendMessage(chan, chatMessage);
+          if (lastPost.media.length == 0) {
+            this.api.sendMessage(chan, chatMessage);
+          } else {
+            this.api.sendMediaGroup(chan, chatMessage, lastPost.media);
+          }
         }
       }
     } catch (e) {

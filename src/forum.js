@@ -31,12 +31,12 @@ class Forum {
       );
     } catch (err) {
       console.error(err);
-      process.exit();
+      return null;
     }
 
-    let threadName = $('.capmain').html();
+    let thread = $('.capmain').html();
 
-    let userName = $('a[href="' + postHash + '"]')
+    let username = $('a[href="' + postHash + '"]')
       .parent()
       .parent()
       .parent()
@@ -44,23 +44,45 @@ class Forum {
       .find('a.header')
       .html();
 
-    let postHtml = striptags(
-      $('a[href="' + postHash + '"]')
-        .parent()
-        .parent()
-        .parent()
-        .next()
-        .find('td')
-        .html(),
-      ['b', 'i', 'a'],
-    );
+    let postTD = $('a[href="' + postHash + '"]')
+      .parent()
+      .parent()
+      .parent()
+      .next()
+      .find('td');
+
+    const media = [];
+
+    let gallery = $(postTD).find('.igdc_gallery');
+
+    if (gallery.length != 0) {
+      $(gallery)
+        .find('a')
+        .each((i, el) => {
+          const rel = $(el)
+            .attr('href')
+            .replace('..', 'http://igdc.ru');
+          media.push(rel);
+        });
+
+      gallery.remove();
+    }
+
+    $(postTD)
+      .find('img')
+      .each((i, el) => {
+        media.push($(el).attr('src'));
+      });
+
+    let html = striptags(postTD.html(), ['b', 'i', 'a', 'pre']);
 
     return {
       id: Number(postHash.replace(/\D/g, '')),
       url: 'http://igdc.ru/' + url,
-      thread: threadName,
-      username: userName,
-      html: postHtml,
+      thread,
+      username,
+      html,
+      media,
     };
   }
 }
