@@ -1,5 +1,7 @@
 const sqlite = require('sqlite3');
 
+const DB_FILE_PATH = process.env['DB_FILE_PATH'] || './data/data.db';
+
 class Db {
   /**
    * Сохранить что-то в БД
@@ -20,7 +22,7 @@ class Db {
           ' (' +
           fields.join(',') +
           ') VALUES (' +
-          fields.map(f => '?').join(',') +
+          fields.map((f) => '?').join(',') +
           ')',
         values,
         (err, result) => {
@@ -54,7 +56,7 @@ class Db {
   }
 
   constructor() {
-    this.db = new sqlite.Database('data.db');
+    this.db = new sqlite.Database(DB_FILE_PATH);
 
     this.db.serialize(() => {
       // Сообщения мини-чата

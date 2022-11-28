@@ -1,4 +1,5 @@
-const fetch = require('node-fetch');
+const axios = require('axios');
+
 /**
  * Telegram API
  */
@@ -43,11 +44,11 @@ module.exports = class TelegramAPI {
     const url = `https://api.telegram.org/bot${this.token}/${method}`;
     const body = data ? JSON.stringify(data) : null;
 
-    return fetch(url, {
+    return await axios(url, {
       method: http_method,
-      body,
+      data: body,
       headers: { 'Content-Type': 'application/json' },
-    }).then(r => r.json());
+    });
   }
 
   /**

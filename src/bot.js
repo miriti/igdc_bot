@@ -1,9 +1,8 @@
+const axios = require('axios');
 const TelegramAPI = require('./api');
-const fetch = require('node-fetch');
 const db = require('./db');
 const forum = require('./forum');
 const news = require('./news');
-const striptags = require('striptags');
 
 module.exports = class Bot {
   /**
@@ -12,11 +11,11 @@ module.exports = class Bot {
    * @param {Array<String>} to Список каналов для отправки
    */
   async fetchShoutbox(to) {
+    let numNew = 0;
     try {
-      let response = await fetch(
-        'http://igdc.ru/infusions/shoutbox_panel/shoutbox.php',
-      );
-      const responseJson = await response.json();
+      const responseJson = (
+        await axios('http://igdc.ru/infusions/shoutbox_panel/shoutbox.php')
+      ).data;
 
       for (let msg of responseJson['messages']) {
         const exists = await db.get('chat', msg['id']);
@@ -37,11 +36,14 @@ module.exports = class Bot {
           for (let chan of to) {
             await this.api.sendMessage(chan, chatMessage);
           }
+
+          numNew++;
         }
       }
     } catch (e) {
       console.error(e);
     }
+    return numNew;
   }
 
   /**
@@ -50,6 +52,7 @@ module.exports = class Bot {
    * @param {Array<String>} to Список каналов для отправки
    */
   async fetchNews(to) {
+    let numNew = 0;
     try {
       const allNews = await news.getNews();
 
@@ -72,19 +75,26 @@ module.exports = class Bot {
           for (let chan of to) {
             await this.api.sendMessage(chan, channelMessage);
           }
+
+          numNew++;
         }
       }
     } catch (e) {
-      console.log(e);
+      console.error(e.message);
     }
+
+    return numNew;
   }
 
   /**
    * Получаем и отпарвляем последнее сообщение форума
    *
    * @param {Array<String>} to Список каналов для отправки
+   *
+   * @returns {Number} Количество новых сообщений на форуме
    */
   async fetchForum(to) {
+    let numNew = 0;
     try {
       const lastPost = await forum.getLastMessage();
 
@@ -112,10 +122,13 @@ module.exports = class Bot {
             this.api.sendMediaGroup(chan, chatMessage, lastPost.media);
           }
         }
+
+        numNew++;
       }
     } catch (e) {
       console.error(e);
     }
+    return numNew;
   }
 
   constructor(token) {

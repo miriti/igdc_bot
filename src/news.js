@@ -1,7 +1,7 @@
 const Parser = require('rss-parser');
-const fetch = require('node-fetch');
 const cheerio = require('cheerio');
 const striptags = require('striptags');
+const axios = require('axios');
 
 class News {
   async getNews() {
@@ -15,10 +15,9 @@ class News {
   async _getNews_crutch() {
     let html;
     try {
-      const response = await fetch('http://igdc.ru/');
-      html = await response.text();
+      html = (await axios('http://igdc.ru/')).data;
     } catch (e) {
-      console.error(e);
+      console.error(e.message);
       return [];
     }
 
@@ -31,29 +30,17 @@ class News {
       if (i > 0) {
         // Парсим ID
         const id = parseInt(
-          $(el)
-            .find('td.capmain a')
-            .first()
-            .attr('name')
-            .replace('news_', ''),
+          $(el).find('td.capmain a').first().attr('name').replace('news_', ''),
         );
 
         // Парсим автора
-        const author = $(el)
-          .find('.capmain_right a')
-          .text();
+        const author = $(el).find('.capmain_right a').text();
 
         // Парсим заголовок
-        const title = $(el)
-          .find('td.capmain')
-          .text();
+        const title = $(el).find('td.capmain').text();
 
         // Первая ссылка в теле это картинка. Убираем ее
-        $(el)
-          .find('.main-body')
-          .find('a')
-          .first()
-          .remove();
+        $(el).find('.main-body').find('a').first().remove();
 
         // Меняем относительные ссылки на абсолютные
         $(el)
@@ -68,12 +55,11 @@ class News {
           });
 
         // Парсим html, который пойдет в текст сообщения
-        const html = striptags(
-          $(el)
-            .find('.main-body')
-            .html(),
-          ['b', 'i', 'a'],
-        ).trim();
+        const html = striptags($(el).find('.main-body').html(), [
+          'b',
+          'i',
+          'a',
+        ]).trim();
 
         result.push({
           id,

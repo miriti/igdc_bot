@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+const axios = require('axios');
 const cheerio = require('cheerio');
 const striptags = require('striptags');
 
@@ -7,8 +7,7 @@ class Forum {
     let $;
 
     try {
-      const response = await fetch('http://igdc.ru/');
-      const html = await response.text();
+      const html = (await axios('http://igdc.ru/')).data;
 
       $ = cheerio.load(html);
     } catch (err) {
@@ -23,14 +22,9 @@ class Forum {
     let postHash = url.slice(url.indexOf('#'));
 
     try {
-      $ = cheerio.load(
-        await fetch('http://igdc.ru/' + url).then(r => r.text()),
-        {
-          decodeEntities: false,
-        },
-      );
+      $ = cheerio.load(await axios('http://igdc.ru/' + url));
     } catch (err) {
-      console.error(err);
+      console.error(err.message);
       return null;
     }
 
@@ -59,9 +53,7 @@ class Forum {
       $(gallery)
         .find('a')
         .each((i, el) => {
-          const rel = $(el)
-            .attr('href')
-            .replace('..', 'http://igdc.ru');
+          const rel = $(el).attr('href').replace('..', 'http://igdc.ru');
           media.push(rel);
         });
 
