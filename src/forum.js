@@ -15,22 +15,22 @@ class Forum {
       return null;
     }
 
-    let lastPostEl = $('.side-body a.sidePost');
+    const lastPostEl = $('.side-body a.sidePost');
 
-    let url = lastPostEl.attr('href');
+    const url = lastPostEl.attr('href');
 
-    let postHash = url.slice(url.indexOf('#'));
+    const postHash = url.slice(url.indexOf('#'));
 
     try {
-      $ = cheerio.load(await axios('http://igdc.ru/' + url));
+      $ = cheerio.load((await axios('http://igdc.ru/' + url)).data);
     } catch (err) {
       console.error(err.message);
       return null;
     }
 
-    let thread = $('.capmain').html();
+    const thread = $('.capmain').html();
 
-    let username = $('a[href="' + postHash + '"]')
+    const username = $('a[href="' + postHash + '"]')
       .parent()
       .parent()
       .parent()
@@ -38,7 +38,7 @@ class Forum {
       .find('a.header')
       .html();
 
-    let postTD = $('a[href="' + postHash + '"]')
+    const postTD = $('a[href="' + postHash + '"]')
       .parent()
       .parent()
       .parent()
@@ -47,7 +47,7 @@ class Forum {
 
     const media = [];
 
-    let gallery = $(postTD).find('.igdc_gallery');
+    const gallery = $(postTD).find('.igdc_gallery');
 
     if (gallery.length != 0) {
       $(gallery)
@@ -66,9 +66,9 @@ class Forum {
         media.push($(el).attr('src'));
       });
 
-    let html = striptags(postTD.html(), ['b', 'i', 'a', 'pre']);
+    const html = striptags(postTD.html(), ['b', 'i', 'a', 'pre']);
 
-    return {
+    const postData = {
       id: Number(postHash.replace(/\D/g, '')),
       url: 'http://igdc.ru/' + url,
       thread,
@@ -76,6 +76,8 @@ class Forum {
       html,
       media,
     };
+
+    return postData;
   }
 }
 
