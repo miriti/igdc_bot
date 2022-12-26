@@ -1,9 +1,11 @@
-const axios = require('axios');
+import axios from 'axios';
 
 /**
  * Telegram API
  */
-module.exports = class TelegramAPI {
+export default class TelegramAPI {
+  private token: string;
+
   /**
    * Send message
    */
@@ -18,7 +20,7 @@ module.exports = class TelegramAPI {
   /**
    * @param {Array<Object>} media
    */
-  async sendMediaGroup(to, message, media) {
+  async sendMediaGroup(to: string, message: string, media: string[]) {
     return this.request('post', 'sendMediaGroup', {
       chat_id: to,
       media: media.map((url, index) => {
@@ -40,7 +42,7 @@ module.exports = class TelegramAPI {
   /**
    * Generic request
    */
-  async request(http_method, method, data) {
+  async request(http_method: 'post' | 'get', method: string, data: any) {
     const url = `https://api.telegram.org/bot${this.token}/${method}`;
     const body = data ? JSON.stringify(data) : null;
 
@@ -54,7 +56,7 @@ module.exports = class TelegramAPI {
   /**
    * Constructor
    */
-  constructor(token) {
+  constructor(token: string) {
     this.token = token;
   }
-};
+}

@@ -1,19 +1,11 @@
-const Parser = require('rss-parser');
-const cheerio = require('cheerio');
-const striptags = require('striptags');
-const axios = require('axios');
+import axios from 'axios';
+import { CheerioAPI, load } from 'cheerio';
+import striptags from 'striptags';
 
 class News {
   async getNews() {
-    // TODO: Используем костыль, пока говнюк не починил RSS :(
-    return this._getNews_crutch();
+    let html: string;
 
-    let feed = await this.parser.parseURL('http://igdc.ru/rss.php');
-    return feed.items;
-  }
-
-  async _getNews_crutch() {
-    let html;
     try {
       html = (await axios('http://igdc.ru/')).data;
     } catch (e) {
@@ -21,7 +13,7 @@ class News {
       return [];
     }
 
-    let $ = cheerio.load(html);
+    let $: CheerioAPI = load(html);
 
     const result = [];
 
@@ -73,9 +65,9 @@ class News {
     return result;
   }
 
-  constructor() {
-    this.parser = new Parser();
-  }
+  constructor() {}
 }
 
-module.exports = new News();
+const news = new News();
+
+export default news;

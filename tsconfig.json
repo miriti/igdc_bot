@@ -1,6 +1,10 @@
 {
     "compilerOptions": {
-        "outDir": "./out"
+        "target": "ESNext",
+        "outDir": "./out",
+        "esModuleInterop": true,
+        "moduleResolution": "node"
     },
-    "include": ["./src/**/*"]
+    "include": ["./src/**/*.ts"],
+    "exclude": ["node_modules"]
 }

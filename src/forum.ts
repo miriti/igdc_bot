@@ -1,15 +1,15 @@
-const axios = require('axios');
-const cheerio = require('cheerio');
-const striptags = require('striptags');
+import axios from 'axios';
+import { CheerioAPI, load } from 'cheerio';
+import striptags from 'striptags';
 
 class Forum {
   async getLastMessage() {
-    let $;
+    let $: CheerioAPI;
 
     try {
       const html = (await axios('http://igdc.ru/')).data;
 
-      $ = cheerio.load(html);
+      $ = load(html);
     } catch (err) {
       console.error(err);
       return null;
@@ -22,15 +22,15 @@ class Forum {
     const postHash = url.slice(url.indexOf('#'));
 
     try {
-      $ = cheerio.load((await axios('http://igdc.ru/' + url)).data);
+      $ = load((await axios('http://igdc.ru/' + url)).data);
     } catch (err) {
       console.error(err.message);
       return null;
     }
 
-    const thread = $('.capmain').html();
+    const thread: string = $('.capmain').html();
 
-    const username = $('a[href="' + postHash + '"]')
+    const username: string = $('a[href="' + postHash + '"]')
       .parent()
       .parent()
       .parent()
@@ -45,7 +45,7 @@ class Forum {
       .next()
       .find('td');
 
-    const media = [];
+    const media: string[] = [];
 
     const gallery = $(postTD).find('.igdc_gallery');
 
@@ -81,4 +81,6 @@ class Forum {
   }
 }
 
-module.exports = new Forum();
+const forum = new Forum();
+
+export default forum;

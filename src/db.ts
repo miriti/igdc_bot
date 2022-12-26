@@ -1,12 +1,14 @@
-const sqlite = require('sqlite3');
+import sqlite from 'sqlite3';
 
 const DB_FILE_PATH = process.env['DB_FILE_PATH'] || './data/data.db';
 
 class Db {
+  private db: sqlite.Database;
+
   /**
    * Сохранить что-то в БД
    */
-  async store(table, data) {
+  async store(table: string, data: { [key: string]: any }) {
     let fields = [];
     var values = [];
 
@@ -39,7 +41,7 @@ class Db {
   /**
    * Получить запись из БД по id
    */
-  async get(table, id) {
+  async get(table: string, id: number) {
     return new Promise((resolve, reject) => {
       this.db.get(
         'SELECT * FROM ' + table + ' WHERE id = ?',
@@ -77,4 +79,6 @@ class Db {
   }
 }
 
-module.exports = new Db();
+const db = new Db();
+
+export default db;

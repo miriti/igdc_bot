@@ -1,6 +1,5 @@
-require('dotenv').config();
-
-const Bot = require('./bot');
+import 'dotenv/config';
+import Bot from './bot.js';
 
 /** Канал для отправки всех обновлений */
 const channel = process.env['CHANNEL'] || '@igdc_updates';
@@ -9,10 +8,10 @@ const channel = process.env['CHANNEL'] || '@igdc_updates';
 const chat = process.env['CHAT'] || '@igdc_chat';
 
 /**
- * @param {Number} ms Сколько ждать в миллисекундах
+ * @param ms Сколько ждать в миллисекундах
  * @returns
  */
-async function delay(ms) {
+async function delay(ms: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });

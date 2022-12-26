@@ -1,10 +1,12 @@
-const axios = require('axios');
-const TelegramAPI = require('./api');
-const db = require('./db');
-const forum = require('./forum');
-const news = require('./news');
+import axios from 'axios';
+import TelegramAPI from './api.js';
+import db from './db.js';
+import forum from './forum.js';
+import news from './news.js';
 
-module.exports = class Bot {
+export default class Bot {
+  private api: TelegramAPI;
+
   /**
    * Получаем и отпарвляем сообщения из чата
    *
@@ -49,9 +51,9 @@ module.exports = class Bot {
   /**
    * Получаем и отпарвляем новости
    *
-   * @param {Array<String>} to Список каналов для отправки
+   * @param to Список каналов для отправки
    */
-  async fetchNews(to) {
+  async fetchNews(to: string[]) {
     let numNew = 0;
     try {
       const allNews = await news.getNews();
@@ -89,11 +91,11 @@ module.exports = class Bot {
   /**
    * Получаем и отпарвляем последнее сообщение форума
    *
-   * @param {Array<String>} to Список каналов для отправки
+   * @param to Список каналов для отправки
    *
-   * @returns {Number} Количество новых сообщений на форуме
+   * @returns Количество новых сообщений на форуме
    */
-  async fetchForum(to) {
+  async fetchForum(to: string[]): Promise<number> {
     let numNew = 0;
     try {
       const lastPost = await forum.getLastMessage();
@@ -134,4 +136,4 @@ module.exports = class Bot {
   constructor(token) {
     this.api = new TelegramAPI(token);
   }
-};
+}
