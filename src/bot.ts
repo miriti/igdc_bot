@@ -1,8 +1,22 @@
 import axios from 'axios';
+import dayjs from 'dayjs';
 import TelegramAPI from './api.js';
 import db from './db.js';
 import forum from './forum.js';
 import news from './news.js';
+
+interface IChatMessage {
+  id: number;
+  time: string;
+  ban_type: number;
+  user: {
+    id: number;
+    name: string;
+    avatar: string;
+    rank: 0;
+  };
+  text: string;
+}
 
 export default class Bot {
   private api: TelegramAPI;
@@ -10,32 +24,29 @@ export default class Bot {
   /**
    * Получаем и отпарвляем сообщения из чата
    *
-   * @param {Array<String>} to Список каналов для отправки
+   * @param  to Список каналов для отправки
    */
-  async fetchShoutbox(to) {
+  async fetchShoutbox(to: string[]) {
     let numNew = 0;
     try {
-      const responseJson = (
+      const responseJson: { messages: IChatMessage[] } = (
         await axios('http://igdc.ru/infusions/shoutbox_panel/shoutbox.php')
       ).data;
 
-      for (let msg of responseJson['messages']) {
-        const exists = await db.get('chat', msg['id']);
+      for (let msg of responseJson.messages.reverse()) {
+        const exists = await db.get('chat', msg.id);
 
         if (!exists) {
           await db.store('chat', {
-            id: msg['id'],
+            id: msg.id,
           });
 
-          const chatMessage =
-            '#миничат' +
-            '\n' +
-            '<b>' +
-            msg['user']['name'].trim() +
-            '</b>: ' +
-            msg['text'];
+          const chatMessage = `#миничат\n<b>${msg.user.name.trim()}</b>: ${
+            msg.text
+          }`;
 
           for (let chan of to) {
+            console.log('Send a minichat message to %s', chan);
             await this.api.sendMessage(chan, chatMessage);
           }
 
@@ -75,6 +86,7 @@ export default class Bot {
             '</i>';
 
           for (let chan of to) {
+            console.log('Send a news to %s', chan);
             await this.api.sendMessage(chan, channelMessage);
           }
 
@@ -98,30 +110,27 @@ export default class Bot {
   async fetchForum(to: string[]): Promise<number> {
     let numNew = 0;
     try {
-      const lastPost = await forum.getLastMessage();
+      const posts = await forum.getNewMessages();
 
-      const existing = await db.get('forum', lastPost['id']);
+      for (const post of posts) {
+        const existing = await db.get('forum', post['id']);
 
-      if (!existing) {
-        db.store('forum', { id: lastPost['id'] });
+        if (!existing) {
+          db.store('forum', { id: post['id'] });
 
-        const chatMessage =
-          '#форум\n' +
-          '<a href="' +
-          lastPost['url'] +
-          '">' +
-          lastPost['thread'] +
-          '</a>\n<b>' +
-          lastPost['username'] +
-          ':' +
-          '</b>\n' +
-          lastPost['html'];
+          const chatMessage = `#форум\n<a href="${post['url']}">${
+            post['thread']
+          }</a>\n<b>${post['username']}</b>, <i>${dayjs(post.date).format(
+            'LLLL',
+          )}</i>:\n\n${post['html']}`;
 
-        for (let chan of to) {
-          if (lastPost.media.length == 0) {
-            this.api.sendMessage(chan, chatMessage);
-          } else {
-            this.api.sendMediaGroup(chan, chatMessage, lastPost.media);
+          for (let chan of to) {
+            console.log('Send a forum message to %s', chan);
+            if (post.media.length == 0) {
+              await this.api.sendMessage(chan, chatMessage);
+            } else {
+              await this.api.sendMediaGroup(chan, chatMessage, post.media);
+            }
           }
         }
 

@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import Bot from './bot.js';
+import forum from './forum.js';
 
 /** Канал для отправки всех обновлений */
 const channel = process.env['CHANNEL'] || '@igdc_updates';
