@@ -132,9 +132,8 @@ export default class Bot {
               await this.api.sendMediaGroup(chan, chatMessage, post.media);
             }
           }
+          numNew++;
         }
-
-        numNew++;
       }
     } catch (e) {
       console.error(e);
