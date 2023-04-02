@@ -36,7 +36,7 @@ async function main() {
       const totalNew =
         (await bot.fetchShoutbox([channel])) +
         (await bot.fetchForum([channel])) +
-        (await bot.fetchNews([channel, chat]));
+        (await bot.fetchNews([channel]));
 
       if (totalNew > 0) {
         delayTime = 60_000; // 1 минута

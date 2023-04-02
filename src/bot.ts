@@ -35,12 +35,7 @@ export default class Bot {
 
       for (let msg of responseJson.messages.reverse()) {
         const exists = await db.get('chat', msg.id);
-
         if (!exists) {
-          await db.store('chat', {
-            id: msg.id,
-          });
-
           const chatMessage = `#миничат\n<b>${msg.user.name.trim()}</b>: ${
             msg.text
           }`;
@@ -50,6 +45,9 @@ export default class Bot {
             await this.api.sendMessage(chan, chatMessage);
           }
 
+          await db.store('chat', {
+            id: msg.id,
+          });
           numNew++;
         }
       }
@@ -73,8 +71,6 @@ export default class Bot {
         const exists = await db.get('news', newsItem['id']);
 
         if (!exists) {
-          await db.store('news', { id: newsItem['id'] });
-
           const channelMessage =
             '#новости\n' +
             '<b>' +
@@ -90,6 +86,7 @@ export default class Bot {
             await this.api.sendMessage(chan, channelMessage);
           }
 
+          await db.store('news', { id: newsItem['id'] });
           numNew++;
         }
       }
@@ -116,8 +113,6 @@ export default class Bot {
         const existing = await db.get('forum', post['id']);
 
         if (!existing) {
-          db.store('forum', { id: post['id'] });
-
           const chatMessage = `#форум\n<a href="${post['url']}">${
             post['thread']
           }</a>\n<b>${post['username']}</b>, <i>${dayjs(post.date).format(
@@ -132,6 +127,7 @@ export default class Bot {
               await this.api.sendMediaGroup(chan, chatMessage, post.media);
             }
           }
+          db.store('forum', { id: post['id'] });
           numNew++;
         }
       }
