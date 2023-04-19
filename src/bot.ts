@@ -23,7 +23,7 @@ function truncate(text: string, link: string, len: number) {
 
   const linkCode = `... <a href="${link}">читать целиком</a>`;
 
-  return text.substring(0, length - linkCode.length - 1) + linkCode;
+  return text.substring(0, len - linkCode.length - 1) + linkCode;
 }
 
 export default class Bot {
