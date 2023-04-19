@@ -18,6 +18,14 @@ interface IChatMessage {
   text: string;
 }
 
+function truncate(text: string, link: string, len: number) {
+  if (text.length < len) return text;
+
+  const linkCode = `... <a href="${link}">читать целиком</a>`;
+
+  return text.substring(0, length - linkCode.length - 1) + linkCode;
+}
+
 export default class Bot {
   private api: TelegramAPI;
 
@@ -117,14 +125,21 @@ export default class Bot {
             post['thread']
           }</a>\n<b>${post['username']}</b>, <i>${dayjs(post.date).format(
             'LLLL',
-          )}</i>:\n\n${post['html']}`;
+          )} GMT</i>:\n\n${post['html']}`;
 
           for (let chan of to) {
             console.log('Send a forum message to %s', chan);
             if (post.media.length == 0) {
-              await this.api.sendMessage(chan, chatMessage);
+              await this.api.sendMessage(
+                chan,
+                truncate(chatMessage, post['url'], 4096),
+              );
             } else {
-              await this.api.sendMediaGroup(chan, chatMessage, post.media);
+              await this.api.sendMediaGroup(
+                chan,
+                truncate(chatMessage, post['url'], 1024),
+                post.media,
+              );
             }
           }
           db.store('forum', { id: post['id'] });
