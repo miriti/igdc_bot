@@ -84,7 +84,7 @@ class Forum {
         id,
         date: postDate,
         html: postableHtml,
-        media,
+        media: media.filter((val, idx, arr) => arr.indexOf(val) === idx),
         username: author,
         thread,
         url: `${url}#p${id}`,
